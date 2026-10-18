@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>event_alert</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pitch: #0d3a2c;
+    --chalk: #ffffff;
+    --ink: #0d1b16;
+    --gold: #e8c15a;
+    --yellow: #f2c522;
+    --red: #d62828;
+  }
+  html, body { margin: 0; width: 1920px; height: 1080px; background: transparent; overflow: hidden; }
+  body { font-family: "Cairo", Tahoma, Arial, sans-serif; }
+
+  /* lower third, centred, inside action-safe */
+  .alert {
+    position: absolute; bottom: 110px; left: 50%;
+    transform: translateX(-50%);
+    display: flex; align-items: stretch; height: 92px;
+    opacity: 0;
+  }
+  .alert.show { animation: life 6s cubic-bezier(.2,.8,.2,1) forwards; }
+  @keyframes life {
+    0%   { opacity: 0; clip-path: inset(0 50% 0 50%); }
+    8%   { opacity: 1; clip-path: inset(0 0 0 0); }
+    90%  { opacity: 1; clip-path: inset(0 0 0 0); }
+    100% { opacity: 0; clip-path: inset(0 50% 0 50%); }
+  }
+
+  .tag {
+    display: flex; align-items: center; justify-content: center; gap: 14px;
+    padding: 0 30px; font-weight: 800; font-size: 44px;
+    background: var(--gold); color: var(--ink);
+  }
+  .card-icon { width: 30px; height: 42px; border-radius: 4px; display: none; }
+  .yellow .tag, .red .tag { background: var(--pitch); color: var(--chalk); font-size: 34px; }
+  .yellow .card-icon { display: block; background: var(--yellow); }
+  .red .card-icon { display: block; background: var(--red); }
+
+  .body {
+    background: var(--pitch); color: var(--chalk);
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 0 34px; min-width: 360px;
+  }
+  .player { font-weight: 800; font-size: 36px; line-height: 1.15; }
+  .meta { font-weight: 600; font-size: 22px; opacity: .85; }
+  .meta bdi { direction: ltr; unicode-bidi: isolate; }
+</style>
+</head>
+<body>
+  <div class="alert" id="alert">
+    <div class="tag"><div class="card-icon"></div><span id="label"></span></div>
+    <div class="body">
+      <div class="player" id="player"></div>
+      <div class="meta" id="meta"></div>
+    </div>
+  </div>
+
+<script>
+  const LABEL = { goal: "هدف!", yellow: "إنذار", red: "طرد" };
+  let data = {};
+
+  function render() {
+    const a = document.getElementById("alert");
+    a.className = "alert " + (data.kind || "goal");
+    document.getElementById("label").textContent = LABEL[data.kind] || "";
+    document.getElementById("player").textContent = data.player || data.team || "";
+    const parts = [];
+    if (data.kind === "goal" && data.team && data.player) parts.push(data.team);
+    if (data.minute != null) parts.push("الدقيقة " + data.minute);
+    if (data.score) parts.push("<bdi>" + data.score + "</bdi>");
+    document.getElementById("meta").innerHTML = parts.join(" | ");
+  }
+
+  function update(d) {
+    if (typeof d === "string") { try { d = JSON.parse(d); } catch (e) { return; } }
+    data = Object.assign({}, data, d);
+    render();
+  }
+  function play() {
+    const a = document.getElementById("alert");
+    a.classList.remove("show"); void a.offsetWidth; a.classList.add("show");  // self-hides after 6s
+  }
+  function stop() { document.getElementById("alert").classList.remove("show"); }
+  function next() {}
+
+  if (location.search.includes("demo")) {
+    update('{"kind":"goal","team":"السد","player":"أكرم عفيف","minute":23,"score":"1 - 0"}');
+    setTimeout(play, 300);
+    setTimeout(() => { update({ kind: "red", player: "لوكاس أوكامبوس", minute: 78, score: "", team: "" }); play(); }, 7000);
+  }
+</script>
+</body>
+</html>

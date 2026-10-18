@@ -1,0 +1,28 @@
+{
+ "response": [
+  {
+   "fixture": {
+    "id": 999,
+    "status": {
+     "short": "NS",
+     "elapsed": null
+    }
+   },
+   "teams": {
+    "home": {
+     "id": 1,
+     "name": "السد"
+    },
+    "away": {
+     "id": 2,
+     "name": "الدحيل"
+    }
+   },
+   "goals": {
+    "home": 0,
+    "away": 0
+   },
+   "events": []
+  }
+ ]
+}

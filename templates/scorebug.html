@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>scorebug</title>
+<!-- Needs internet for the web font; without it Tahoma is used. For air, put a .ttf next to this file and use @font-face. -->
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pitch: #0d3a2c;
+    --pitch-2: #145440;
+    --chalk: #ffffff;
+    --ink: #0d1b16;
+    --gold: #e8c15a;
+  }
+  html, body { margin: 0; width: 1920px; height: 1080px; background: transparent; overflow: hidden; }
+  body { font-family: "Cairo", Tahoma, Arial, sans-serif; }
+
+  /* top-left, inside title-safe */
+  .bug {
+    position: absolute; top: 60px; left: 96px;
+    display: flex; align-items: stretch; height: 56px;
+    clip-path: inset(0 0 0 100%);              /* hidden until play() */
+    transition: clip-path 450ms cubic-bezier(.2,.8,.2,1);
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,.35));
+  }
+  .bug.on { clip-path: inset(0 0 0 0); }
+
+  .team {
+    background: var(--pitch); color: var(--chalk);
+    font-weight: 600; font-size: 26px; line-height: 56px;
+    padding: 0 22px; min-width: 150px; text-align: center; white-space: nowrap;
+  }
+  .team.away { background: var(--pitch-2); }
+
+  .score {
+    background: var(--chalk); color: var(--ink);
+    font-weight: 800; font-size: 32px; line-height: 56px;
+    padding: 0 18px; min-width: 96px; text-align: center;
+    direction: ltr;                             /* "home - away" reads correctly */
+  }
+  .score span { display: inline-block; }
+  .score span.bump { animation: bump 700ms ease-out; }
+  @keyframes bump {
+    0% { transform: scale(1); color: var(--ink); }
+    30% { transform: scale(1.45); color: #b8860b; }
+    100% { transform: scale(1); color: var(--ink); }
+  }
+
+  .clock {
+    background: var(--gold); color: var(--ink);
+    font-weight: 800; font-size: 24px; line-height: 56px;
+    padding: 0 16px; min-width: 70px; text-align: center; direction: ltr;
+  }
+</style>
+</head>
+<body>
+  <div class="bug" id="bug">
+    <div class="team home" id="home">—</div>
+    <div class="score"><span id="hs">0</span> - <span id="as">0</span></div>
+    <div class="team away" id="away">—</div>
+    <div class="clock" id="clock"></div>
+  </div>
+
+<script>
+  const state = { home: "", away: "", homeScore: 0, awayScore: 0, minute: null, status: "NS" };
+  const STATUS = { NS: "قبل", HT: "استراحة", FT: "النهاية", AET: "النهاية", PEN: "ترجيح", P: "ترجيح" };
+
+  function setText(id, value, bump) {
+    const el = document.getElementById(id);
+    const v = String(value);
+    if (el.textContent !== v) {
+      el.textContent = v;
+      if (bump) { el.classList.remove("bump"); void el.offsetWidth; el.classList.add("bump"); }
+    }
+  }
+
+  function render() {
+    setText("home", state.home);
+    setText("away", state.away);
+    setText("hs", state.homeScore, true);
+    setText("as", state.awayScore, true);
+    const clock = STATUS[state.status] ?? (state.minute != null ? state.minute + "'" : "");
+    setText("clock", clock);
+  }
+
+  // ---- CasparCG HTML template API ----
+  // CasparCG passes data as a string; we accept a JSON string or an object.
+  function update(data) {
+    let d = data;
+    if (typeof d === "string") { try { d = JSON.parse(d); } catch (e) { return; } }
+    Object.assign(state, d);
+    render();
+  }
+  function play() { document.getElementById("bug").classList.add("on"); }
+  function stop() { document.getElementById("bug").classList.remove("on"); }
+  function next() {}
+
+  // Open in a normal browser with ?demo to preview without CasparCG
+  if (location.search.includes("demo")) {
+    update('{"home":"السد","away":"الدحيل","homeScore":1,"awayScore":0,"minute":23,"status":"1H"}');
+    setTimeout(play, 300);
+    setTimeout(() => update({ awayScore: 1, minute: 61 }), 2500);
+  }
+</script>
+</body>
+</html>

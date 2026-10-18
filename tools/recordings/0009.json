@@ -1,0 +1,71 @@
+{
+ "response": [
+  {
+   "fixture": {
+    "id": 999,
+    "status": {
+     "short": "2H",
+     "elapsed": 61
+    }
+   },
+   "teams": {
+    "home": {
+     "id": 1,
+     "name": "السد"
+    },
+    "away": {
+     "id": 2,
+     "name": "الدحيل"
+    }
+   },
+   "goals": {
+    "home": 1,
+    "away": 1
+   },
+   "events": [
+    {
+     "time": {
+      "elapsed": 23
+     },
+     "team": {
+      "id": 1,
+      "name": "السد"
+     },
+     "player": {
+      "name": "أكرم عفيف"
+     },
+     "type": "Goal",
+     "detail": "Normal Goal"
+    },
+    {
+     "time": {
+      "elapsed": 30
+     },
+     "team": {
+      "id": 2,
+      "name": "الدحيل"
+     },
+     "player": {
+      "name": "المعز علي"
+     },
+     "type": "Card",
+     "detail": "Yellow Card"
+    },
+    {
+     "time": {
+      "elapsed": 61
+     },
+     "team": {
+      "id": 2,
+      "name": "الدحيل"
+     },
+     "player": {
+      "name": "المعز علي"
+     },
+     "type": "Goal",
+     "detail": "Normal Goal"
+    }
+   ]
+  }
+ ]
+}

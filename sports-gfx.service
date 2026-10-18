@@ -1,0 +1,14 @@
+[Unit]
+Description=Live Sports Graphics Controller
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+WorkingDirectory=/opt/sports-gfx
+ExecStart=/opt/sports-gfx/.venv/bin/python -m app.main
+Environment=ENGINE=caspar ENGINE_HOST=127.0.0.1 FEED=replay POLL_INTERVAL=2 PYTHONUNBUFFERED=1
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
