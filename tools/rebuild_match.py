@@ -75,11 +75,12 @@ def main():
     # Own goals: providers differ on which team they list. Pick the reading that matches the final score.
     flip = False
     end = (999, 99)
+    complete = True
     if score_at(events, end, home_id, False) != final:
         if score_at(events, end, home_id, True) == final:
             flip = True
         else:
-            print("warning: events don't add up to the final score", final, "- replay will still run")
+            complete = False
 
     def stoppage(period_end):
         extras = [when(e)[1] for e in events if when(e)[0] == period_end]
@@ -105,7 +106,12 @@ def main():
 
     for i, (status, minute, cut) in enumerate(ticks):
         shown = [e for e in events if when(e) <= cut]
-        h, a = score_at(events, cut, home_id, flip) if status != "NS" else (0, 0)
+        if status == "NS":
+            h, a = 0, 0
+        elif cut == end:
+            h, a = final                  # full time always shows the official result
+        else:
+            h, a = score_at(events, cut, home_id, flip)
         snap = {"errors": [], "response": [{
             "fixture": {"id": fid, "status": {"short": status,
                                                "elapsed": minute if minute is not None else (90 if status != "NS" else None)}},
@@ -121,6 +127,14 @@ def main():
         el, ex = when(e)
         mark = f"{el}+{ex}" if ex else f"{el}"
         print(f"   {mark:>6}'  {e['type']:<6} {e.get('detail',''):<16} {(e.get('player') or {}).get('name')}")
+    if not complete:
+        got = score_at(events, end, home_id, flip)
+        print("\n" + "!" * 70)
+        print(f"!! WARNING: the goal events add up to {got[0]}-{got[1]}, the official result is {final[0]}-{final[1]}.")
+        print("!! The provider has no (or incomplete) event data for this match, usual for youth")
+        print("!! and lower leagues. Goals will not appear minute by minute; only full time is right.")
+        print("!! Choose a match from a top league for testing and for the demo.")
+        print("!" * 70)
     print(f'\nnext:  $env:REPLAY_DIR="tools/recordings/rebuilt/{fid}"; $env:POLL_INTERVAL="0.5"; python -m app.main')
 
 

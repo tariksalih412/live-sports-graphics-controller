@@ -83,3 +83,32 @@ def test_missed_penalty_is_not_a_goal():
         "events": [{"time": {"elapsed": 55}, "team": {"id": 1}, "player": {"name": "P"},
                     "type": "Goal", "detail": "Missed Penalty"}]}]}
     assert map_api_football(raw).events[0].type == "other"
+
+
+# ---- CasparCG command format ----
+from app.formatters import CasparFormatter  # noqa: E402
+
+
+def test_full_sync_adds_scorebug_on_layer_20():
+    cmd = CasparFormatter().render("full_sync", s(1, 0))[0]
+    assert cmd.startswith("CG 1-20 ADD 1 scorebug 1 ")
+    assert '\\"homeScore\\": 1' in cmd
+
+
+def test_score_update_sends_only_scores():
+    cmd = CasparFormatter().render("score", s(2, 1))[0]
+    assert cmd.startswith("CG 1-20 UPDATE 1 ") and "home\\\"" not in cmd.split("UPDATE 1 ")[1].replace("homeScore", "")
+
+
+def test_goal_alert_goes_to_layer_21():
+    g = Event(id="g1", minute=11, type="goal", team_id=1, player="P")
+    ch = diff(s(minute=11), s(1, 0, minute=11, events=[g]))
+    cmd = CasparFormatter().render("goal", ch[1][1])[0]
+    assert cmd.startswith("CG 1-21 ADD 1 event_alert 1 ") and '\\"player\\": \\"P\\"' in cmd
+
+
+def test_goal_alert_sends_home_and_away_scores_separately():
+    g = Event(id="g1", minute=11, type="goal", team_id=2, player="P")
+    ch = diff(s(minute=11), s(0, 1, minute=11, events=[g]))
+    cmd = CasparFormatter().render("goal", ch[1][1])[0]
+    assert '\\"homeScore\\": 0' in cmd and '\\"awayScore\\": 1' in cmd

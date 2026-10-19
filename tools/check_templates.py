@@ -1,6 +1,6 @@
-"""Step 4: test the two HTML templates on a running CasparCG, no typing needed.
-  python tools/test_templates.py            (127.0.0.1:5250)
-  python tools/test_templates.py 127.0.0.1 5260
+"""Check the two HTML templates on a running CasparCG, no typing needed.
+  python tools/check_templates.py            (127.0.0.1:5250)
+  python tools/check_templates.py 127.0.0.1 5260
 Set TEMPLATE_BASE=http://127.0.0.1:8088/ to load templates over HTTP instead of the template folder.
 Watch the CasparCG window while it runs.
 """
@@ -25,7 +25,7 @@ STEPS = [
      "CG 1-20 UPDATE 1 " + amcp_quote({"homeScore": 1, "minute": 23}), 2),
     ("Goal alert (bottom, hides itself after 6s)",
      "CG 1-21 ADD 1 " + tpl("event_alert") + " 1 " + amcp_quote(
-         {"kind": "goal", "team": "السد", "player": "أكرم عفيف", "minute": 23, "score": "1 - 0"}), 8),
+         {"kind": "goal", "team": "السد", "player": "أكرم عفيف", "minute": 23, "homeScore": 1, "awayScore": 0}), 8),
     ("Clock shows half time",
      "CG 1-20 UPDATE 1 " + amcp_quote({"minute": 45, "status": "HT"}), 3),
     ("Red card alert",

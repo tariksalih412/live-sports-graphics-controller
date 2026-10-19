@@ -30,14 +30,16 @@
     background: var(--pitch); color: var(--chalk);
     font-weight: 600; font-size: 26px; line-height: 56px;
     padding: 0 22px; min-width: 150px; text-align: center; white-space: nowrap;
+    unicode-bidi: plaintext;                    /* Latin names keep their own order inside the RTL row */
   }
   .team.away { background: var(--pitch-2); }
 
   .score {
     background: var(--chalk); color: var(--ink);
     font-weight: 800; font-size: 32px; line-height: 56px;
-    padding: 0 18px; min-width: 96px; text-align: center;
-    direction: ltr;                             /* "home - away" reads correctly */
+    padding: 0 18px; min-width: 96px;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    /* no direction override: in RTL the home score sits on the right, next to the home name */
   }
   .score span { display: inline-block; }
   .score span.bump { animation: bump 700ms ease-out; }
@@ -57,14 +59,15 @@
 <body>
   <div class="bug" id="bug">
     <div class="team home" id="home">—</div>
-    <div class="score"><span id="hs">0</span> - <span id="as">0</span></div>
+    <div class="score"><span id="hs">0</span><span class="sep">-</span><span id="as">0</span></div>
     <div class="team away" id="away">—</div>
     <div class="clock" id="clock"></div>
   </div>
 
 <script>
   const state = { home: "", away: "", homeScore: 0, awayScore: 0, minute: null, status: "NS" };
-  const STATUS = { NS: "قبل", HT: "استراحة", FT: "النهاية", AET: "النهاية", PEN: "ترجيح", P: "ترجيح" };
+  const STATUS = { NS: "قبل", HT: "استراحة", BT: "استراحة", FT: "النهاية", AET: "النهاية", PEN: "ترجيح", P: "ترجيح",
+                   SUSP: "متوقفة", INT: "متوقفة", PST: "مؤجلة", CANC: "ملغاة", ABD: "ملغاة" };
 
   function setText(id, value, bump) {
     const el = document.getElementById(id);

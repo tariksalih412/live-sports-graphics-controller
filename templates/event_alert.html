@@ -46,9 +46,9 @@
     display: flex; flex-direction: column; justify-content: center;
     padding: 0 34px; min-width: 360px;
   }
-  .player { font-weight: 800; font-size: 36px; line-height: 1.15; }
+  .player { font-weight: 800; font-size: 36px; line-height: 1.15; unicode-bidi: plaintext; }
   .meta { font-weight: 600; font-size: 22px; opacity: .85; }
-  .meta bdi { direction: ltr; unicode-bidi: isolate; }
+  .meta .sc { display: inline-flex; gap: 6px; font-weight: 800; }
 </style>
 </head>
 <body>
@@ -70,9 +70,12 @@
     document.getElementById("label").textContent = LABEL[data.kind] || "";
     document.getElementById("player").textContent = data.player || data.team || "";
     const parts = [];
-    if (data.kind === "goal" && data.team && data.player) parts.push(data.team);
+    if (data.kind === "goal" && data.team && data.player) parts.push("<bdi>" + data.team + "</bdi>");
     if (data.minute != null) parts.push("الدقيقة " + data.minute);
-    if (data.score) parts.push("<bdi>" + data.score + "</bdi>");
+    if (data.homeScore != null && data.awayScore != null) {
+      // flex follows the page direction (RTL): home score on the right, like the scorebug
+      parts.push('<span class="sc"><span>' + data.homeScore + '</span><span>-</span><span>' + data.awayScore + '</span></span>');
+    }
     document.getElementById("meta").innerHTML = parts.join(" | ");
   }
 
@@ -89,9 +92,9 @@
   function next() {}
 
   if (location.search.includes("demo")) {
-    update('{"kind":"goal","team":"السد","player":"أكرم عفيف","minute":23,"score":"1 - 0"}');
+    update('{"kind":"goal","team":"السد","player":"أكرم عفيف","minute":23,"homeScore":1,"awayScore":0}');
     setTimeout(play, 300);
-    setTimeout(() => { update({ kind: "red", player: "لوكاس أوكامبوس", minute: 78, score: "", team: "" }); play(); }, 7000);
+    setTimeout(() => { update({ kind: "red", player: "لوكاس أوكامبوس", minute: 78, homeScore: null, awayScore: null, team: "" }); play(); }, 7000);
   }
 </script>
 </body>

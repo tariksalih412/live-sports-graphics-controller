@@ -1,12 +1,27 @@
+# Python
 .venv/
 __pycache__/
 *.pyc
 .pytest_cache/
+
+# Secrets
 .env
 *.key
+
+# Runtime logs
+logs/
+
+# Real match data from the provider (their terms usually forbid redistribution)
 tools/recordings/live/
 tools/recordings/full/
 tools/recordings/rebuilt/
+
+# Large raw recordings (keep only the GIF and screenshots in docs/media)
+*.mkv
+*.mp4
+
+# OS / editors
 .vscode/
 .idea/
 Thumbs.db
+.DS_Store
